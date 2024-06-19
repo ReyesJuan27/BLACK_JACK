@@ -1,0 +1,88 @@
+/* Fundamental Things */
+
+
+html, body {
+    margin: 0;
+    background-color: green;
+    overflow: hidden;
+}
+
+.container {
+    position: relative;
+}
+
+.inactivo {
+    display: none;
+}
+
+.theHeader {
+    text-align: center;
+    background-color: black;
+    color: white;
+    padding: 10px;
+    font-size: 18px;
+}
+
+
+/* The nav-bar confirguration */
+
+
+.nav-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 24px; 
+    padding: 0 24px;
+    height: 60px;
+}
+
+#bottonContainer {
+    position: absolute;
+    right: 50%;
+    transform: translateX(50%);
+    text-align: center; 
+}
+
+#playerHeading{
+    position: absolute;
+    left: 50px; 
+}
+
+#bossHeading{
+    position: absolute;
+    right: 50px; 
+}
+
+
+/* Player-Computer Cards Images */
+
+
+.cardImage{
+    position: relative;
+    width: 150px;
+    left: 100px;
+    margin-left: -75px;
+    height: auto;
+}
+
+.cardImagePc{
+    position: relative;
+    width: 150px;
+    left: 180px;
+    margin-right: -75px;
+    height: auto;
+}
+
+
+/* Nav bar of the Cards Images */
+
+
+.containerCards{
+    display: flex;
+    justify-content: space-between;
+}
+
+.imagesCardsPlayer, .imagesCardsPc{ 
+    width: 650px;
+    margin: 20px;
+}
