@@ -61,6 +61,7 @@ const createDeckCardsPlayer = () => {
         deckCardsPlayer.push(`assets/cartas/${probabilityOfCardsPlayer()}${randomLetterCard()}.png`); 
 }
 console.log(deckCardsPlayer, 'soy player');
+console.log(arrayScorePlayer);
 
 }
 
@@ -90,6 +91,8 @@ const createDeckCardsPc = () => {
         deckCardsPc.push(`assets/cartas/${probabilityOfCardsPc()}${randomLetterCard()}.png`);
     }
     console.log(deckCardsPc,'soy pc');
+    console.log(arrayScorePc);
+
      
 }
 
@@ -106,9 +109,10 @@ const addImageHtml = () => {
         imageDesignerPlayer.setAttribute('src', deckCardsPlayer[counterFunctionPlayer]);
         imageContainerPlayer.append(imageDesignerPlayer);
         
-        scoreCounterPlayer();
+        scoreCounterPlayer(counterFunctionPlayer)
         counterFunctionPlayer++;
         gameFunctionCardsPc();
+        console.log(arrayScorePlayer);
         
     }
 }
@@ -136,8 +140,19 @@ const gameFunctionCardsPc = async () => {
 
 
 function scoreCounterPlayer (randomMathNumber) { 
-    arrayScorePlayer.push(randomMathNumber)
-    scoreBarPlayer.innerHTML = arrayScorePlayer[counterFunctionPlayer]
+    if (arrayScorePlayer.length < 5) arrayScorePlayer.push(randomMathNumber);
+    
+    scoreBarPlayer.innerHTML = arrayScorePlayer[randomMathNumber];
+    let sum = 0;
+    
+    for (let i = 0; i <= randomMathNumber; i++) {
+        sum += arrayScorePlayer[i];
+    }
+    
+    scoreBarPlayer.innerHTML = sum;
+
+        
+
 }
 
 function scoreCounterPc (randomMathNumber) { 
