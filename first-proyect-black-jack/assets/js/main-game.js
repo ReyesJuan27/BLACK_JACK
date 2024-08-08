@@ -3,29 +3,36 @@
 
 const btnNewGame = document.querySelector('#btnNewGame');
 const btnAskCard = document.querySelector('#btnAskCard');
-const btnStop = document.querySelector('#btnStop');
+const btnStay = document.querySelector('#btnStay');
 
 const imageContainerPlayer = document.querySelector('.imagesCardsPlayer');
 const imageContainerPc = document.querySelector('.imagesCardsPc');
 
+const scoreBarPlayer = document.querySelector('#scoreBarPlayer');
+const scoreBarPc = document.querySelector('#scoreBarPc');
 
-// Basic arrays and counter what its used in the functions 
+
+
+// Basic arrays/objects that's used in the functions 
 
 
 let deckCardsPlayer = [];
 let deckCardsPc = [];
+let arrayScorePlayer = []
+let arrayScorePc = []
 let counterFunctionPlayer = 0;
+const especialCards = { 11 : 'A', 12 : 'J', 13 : 'K', 14 : 'Q'};
+const possibleLetters = ['C','D','H','S'];
 
 
 // Random cards for choise one of the nummbers and letters
 
 
 const randomLetterCard = ()=> {
-    let posibleLetters = ['C','D','H','S'];
 
-    let ramdomIndex = Math.floor( Math.random() * posibleLetters.length );
+    let ramdomIndex = Math.floor( Math.random() * possibleLetters.length );
 
-    let ramdomLetter = posibleLetters[ramdomIndex];
+    let ramdomLetter = possibleLetters[ramdomIndex];
 
     return ramdomLetter
 }
@@ -35,108 +42,63 @@ const randomLetterCard = ()=> {
 
 
 const createDeckCardsPlayer = () => {
-
-    if ( deckCardsPlayer.length >= 5 ) {
-
-        imageContainerPlayer.innerHTML = ''
-        imageContainerPc.innerHTML = ''
-        deckCardsPlayer = [];
-        deckCardsPc = [];
-        counterFunctionPlayer = 0;
-        createDeckCardsPc();
-        console.log('nuevas Barajas');
-
-    } 
-
+   
     for ( let i = 0; i < 5; i++ ) {
         
-        let randomNumberCard = 2 + Math.random() * 8;
-        randomNumberCard = Math.round(randomNumberCard);
+        let randomNumberCard = Math.round(2 + Math.random() * 12);
+        const probabilityOfCardsPlayer = () => {
 
-        deckCardsPlayer.push(`assets/cartas/${randomNumberCard}${randomLetterCard()}.png`);
-    }
-    console.log(deckCardsPlayer);
-      
+            if (randomNumberCard <= 10) { 
+                scoreCounterPlayer(randomNumberCard);
+                return randomNumberCard
+
+            } else {
+                scoreCounterPlayer(especialCards[randomNumberCard]);
+                return especialCards[randomNumberCard]
+            }
+        }
+        
+        deckCardsPlayer.push(`assets/cartas/${probabilityOfCardsPlayer()}${randomLetterCard()}.png`); 
+}
+console.log(deckCardsPlayer, 'soy player');
+
 }
 
-const especialCardsDeck = () => {
-    const probabilityFaceCards = 0.3;
-    const probabilityAcesCards = 0.1;
-    const faceCardsGroup = [ 'J', 'Q', 'K'];
-    
-    const randomValue = Math.random();
-
-    if ( randomValue < probabilityFaceCards ) {
-
-        const randomFace = faceCardsGroup[Math.floor(Math.random() * faceCardsGroup.length)];
-        return randomNumberCard = randomFace;
-
-    } else if ( randomValue < probabilityAcesCards ) {
-        return randomNumberCard = 'A'
-    }
-}
+createDeckCardsPlayer();
 
 
-// const createDeckCardsPlayer = () => {
-
-//     if (deckCardsPlayer.length >= 5) {
-
-//         imageContainerPlayer.innerHTML = '';
-//         imageContainerPc.innerHTML = '';
-//         deckCardsPlayer = [];
-//         deckCardsPc = [];
-//         counterFunctionPlayer = 0;
-//         createDeckCardsPc();
-//         console.log('Nuevas Barajas');
-
-//     }
-
-//     for (let i = 0; i < 5; i++) {
-//         const cardValue = especialCardsDeck(); // Utiliza la función especialCardsDeck para obtener el valor de la carta
-//         deckCardsPlayer.push(`assets/cartas/${cardValue}${randomLetterCard()}.png`);
-//     }
-//     console.log(deckCardsPlayer);
-// }
-
-// const especialCardsDeck = () => {
-//     const probabilityFaceCards = 0.3;
-//     const probabilityAcesCards = 0.1;
-//     const faceCardsGroup = ['J', 'Q', 'K'];
-
-//     const randomValue = Math.random();
-
-//     if (randomValue < probabilityFaceCards) {
-//         const randomFace = faceCardsGroup[Math.floor(Math.random() * faceCardsGroup.length)];
-//         return randomFace;
-//     } else if (randomValue < probabilityAcesCards) {
-//         return 'A';
-//     } else {
-//         // Si no es una carta especial, devuelve un número aleatorio
-//         const randomNumberCard = 2 + Math.floor(Math.random() * 7); // Ajusta el rango según tus necesidades
-//         return randomNumberCard.toString();
-//     }
-// }
-
+// Here was something
 
 
 const createDeckCardsPc = () => {
         
     for ( let i = 0; i < 5; i++ ) {
         
-        let randomNumberCard = 2 + Math.random() * 8;
-        randomNumberCard = Math.round(randomNumberCard);
+        let randomNumberCard = Math.round(2 + Math.random() * 12);
+        const probabilityOfCardsPc = () => {
 
-        deckCardsPc.push(`assets/cartas/${randomNumberCard}${randomLetterCard()}.png`);
+            if (randomNumberCard <= 10) { 
+                scoreCounterPc(randomNumberCard);
+                return randomNumberCard
+
+            } else {
+                scoreCounterPc(especialCards[randomNumberCard]);
+                return especialCards[randomNumberCard]
+            }
+        }
+
+        deckCardsPc.push(`assets/cartas/${probabilityOfCardsPc()}${randomLetterCard()}.png`);
     }
     console.log(deckCardsPc,'soy pc');
      
 }
 
+createDeckCardsPc();
 
-// If the User want to asked a new card and show in the game
+// Modificate the Html for add the images 
 
 
-const askCardFunctionPlayer = () => {
+const addImageHtml = () => {
     if ( counterFunctionPlayer < 5 ) {
 
         let imageDesignerPlayer = document.createElement('img');
@@ -144,14 +106,16 @@ const askCardFunctionPlayer = () => {
         imageDesignerPlayer.setAttribute('src', deckCardsPlayer[counterFunctionPlayer]);
         imageContainerPlayer.append(imageDesignerPlayer);
         
+        scoreCounterPlayer();
         counterFunctionPlayer++;
         gameFunctionCardsPc();
-
+        
     }
 }
 
+btnAskCard.addEventListener('click', addImageHtml);
 
-// Show the cards of the Pc after the game of the Player
+// Show the cards of the Pc after the play of the Player
 
 
 const gameFunctionCardsPc = async () => {
@@ -162,25 +126,47 @@ const gameFunctionCardsPc = async () => {
         imageDesignerPc.classList.add('cardImagePc');
         imageDesignerPc.setAttribute('src', deckCardsPc[i]);
         imageContainerPc.append(imageDesignerPc);
+        scoreBarPc.innerHTML = arrayScorePc[i];
 
         await new Promise(resolve => setTimeout(resolve, 1000));
     }
 }
 
+// Score Bar of the Player and the Pc
 
-// Some of the invocates of functions and event Listenner
+
+function scoreCounterPlayer (randomMathNumber) { 
+    arrayScorePlayer.push(randomMathNumber)
+    scoreBarPlayer.innerHTML = arrayScorePlayer[counterFunctionPlayer]
+}
+
+function scoreCounterPc (randomMathNumber) { 
+    arrayScorePc.push(randomMathNumber)
+}    
 
 
-createDeckCardsPlayer();
-createDeckCardsPc();
 
 
 // Button Actions
 
 
-btnAskCard.addEventListener('click', askCardFunctionPlayer);
-btnNewGame.addEventListener('click', createDeckCardsPlayer);
-btnStop.addEventListener('click', ()=> {
+btnNewGame.addEventListener('click' , ()=> {
+
+    imageContainerPlayer.innerHTML = '';
+    imageContainerPc.innerHTML = '';
+    deckCardsPlayer = [];
+    deckCardsPc = [];
+    arrayScorePlayer = [];
+    arrayScorePc = [];
+    counterFunctionPlayer = 0;
+    createDeckCardsPlayer();
+    createDeckCardsPc();
+    console.log('nuevas Barajas');
+    console.log(arrayScorePlayer)
+    
+    });
+
+btnStay.addEventListener('click', ()=> {
 
     if ( counterFunctionPlayer < 5 ) {
         counterFunctionPlayer = 5;
@@ -188,6 +174,7 @@ btnStop.addEventListener('click', ()=> {
     }
     
 });
+
 
 
 
