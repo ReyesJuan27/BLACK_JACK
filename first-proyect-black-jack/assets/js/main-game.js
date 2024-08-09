@@ -18,10 +18,18 @@ const scoreBarPc = document.querySelector('#scoreBarPc');
 
 let deckCardsPlayer = [];
 let deckCardsPc = [];
-let arrayScorePlayer = []
-let arrayScorePc = []
+let arrayOfValuesPlayer = []
+let arrayOfValuesPc = []
 let counterFunctionPlayer = 0;
-const especialCards = { 11 : 'A', 12 : 'J', 13 : 'K', 14 : 'Q'};
+let counterFunctionPc = 0;
+
+let sumPlayer = 0;
+let sumPc = 0;
+let theTruthPlayer;
+let theTruthPc;
+let valueSpecialCard;
+
+const specialCards = { 11 : 'A', 12 : 'J', 13 : 'K', 14 : 'Q'};
 const possibleLetters = ['C','D','H','S'];
 
 
@@ -43,55 +51,51 @@ const randomLetterCard = ()=> {
 
 const createDeckCardsPlayer = () => {
    
-    for ( let i = 0; i < 5; i++ ) {
+    for ( let i = 0; i < 6; i++ ) {
         
-        let randomNumberCard = Math.round(2 + Math.random() * 12);
         const probabilityOfCardsPlayer = () => {
+            let randomNumberCard = Math.round(2 + Math.random() * 12); // random number 2-14
 
             if (randomNumberCard <= 10) { 
                 scoreCounterPlayer(randomNumberCard);
                 return randomNumberCard
-
+                
             } else {
-                scoreCounterPlayer(especialCards[randomNumberCard]);
-                return especialCards[randomNumberCard]
+                scoreCounterPlayer(specialCards[randomNumberCard]);
+                return specialCards[randomNumberCard]
             }
         }
         
         deckCardsPlayer.push(`assets/cartas/${probabilityOfCardsPlayer()}${randomLetterCard()}.png`); 
 }
 console.log(deckCardsPlayer, 'soy player');
-console.log(arrayScorePlayer);
+console.log(arrayOfValuesPlayer);
 
 }
 
 createDeckCardsPlayer();
 
-
-// Here was something
-
-
 const createDeckCardsPc = () => {
         
-    for ( let i = 0; i < 5; i++ ) {
+    for ( let i = 0; i < 6; i++ ) {
         
         let randomNumberCard = Math.round(2 + Math.random() * 12);
         const probabilityOfCardsPc = () => {
 
-            if (randomNumberCard <= 10) { 
+            if (randomNumberCard <= 10) {
                 scoreCounterPc(randomNumberCard);
                 return randomNumberCard
 
             } else {
-                scoreCounterPc(especialCards[randomNumberCard]);
-                return especialCards[randomNumberCard]
+                scoreCounterPc(specialCards[randomNumberCard]);
+                return specialCards[randomNumberCard]
             }
         }
 
         deckCardsPc.push(`assets/cartas/${probabilityOfCardsPc()}${randomLetterCard()}.png`);
     }
     console.log(deckCardsPc,'soy pc');
-    console.log(arrayScorePc);
+    console.log(arrayOfValuesPc);
 
      
 }
@@ -102,18 +106,21 @@ createDeckCardsPc();
 
 
 const addImageHtml = () => {
-    if ( counterFunctionPlayer < 5 ) {
-
+    if ( counterFunctionPlayer < 6 ) {
+        
+        
         let imageDesignerPlayer = document.createElement('img');
         imageDesignerPlayer.classList.add('cardImage');
         imageDesignerPlayer.setAttribute('src', deckCardsPlayer[counterFunctionPlayer]);
         imageContainerPlayer.append(imageDesignerPlayer);
         
-        scoreCounterPlayer(counterFunctionPlayer)
+        theTruthPlayer = true;
+        let realSumScore = scoreCounterPlayer(counterFunctionPlayer)
+        functionOfWinner(realSumScore, 0);
         counterFunctionPlayer++;
-        gameFunctionCardsPc();
-        console.log(arrayScorePlayer);
-        
+
+
+        gameFunctionCardsPc();        
     }
 }
 
@@ -124,15 +131,21 @@ btnAskCard.addEventListener('click', addImageHtml);
 
 const gameFunctionCardsPc = async () => {
     
-    for ( let i = 0; counterFunctionPlayer == 5 && i <= 4 ; i++ ) {
+    for ( let i = 0; counterFunctionPlayer >= 5 && i <= 5 && counterFunctionPc == 0 ; i++ ) {
         
         let imageDesignerPc = document.createElement('img');
         imageDesignerPc.classList.add('cardImagePc');
         imageDesignerPc.setAttribute('src', deckCardsPc[i]);
         imageContainerPc.append(imageDesignerPc);
-        scoreBarPc.innerHTML = arrayScorePc[i];
+        scoreBarPc.innerHTML = arrayOfValuesPc[i];
+        
+        theTruthPc = true;
+        let realSumScore = scoreCounterPc(counterFunctionPc);
+        functionOfWinner(0, realSumScore);
 
+        
         await new Promise(resolve => setTimeout(resolve, 1000));
+        // if (functionOfWinner){counterFunctionPc = 1}
     }
 }
 
@@ -140,25 +153,59 @@ const gameFunctionCardsPc = async () => {
 
 
 function scoreCounterPlayer (randomMathNumber) { 
-    if (arrayScorePlayer.length < 5) arrayScorePlayer.push(randomMathNumber);
-    
-    scoreBarPlayer.innerHTML = arrayScorePlayer[randomMathNumber];
-    let sum = 0;
-    
-    for (let i = 0; i <= randomMathNumber; i++) {
-        sum += arrayScorePlayer[i];
+    if (arrayOfValuesPlayer.length < 6) { 
+        (randomMathNumber ==='J' || randomMathNumber ==='K' || randomMathNumber ==='Q') ? arrayOfValuesPlayer.push(10):
+        (randomMathNumber ==='A') ? arrayOfValuesPlayer.push(1):
+        arrayOfValuesPlayer.push(randomMathNumber);
     }
     
-    scoreBarPlayer.innerHTML = sum;
+    if (theTruthPlayer) { 
+        sumPlayer += arrayOfValuesPlayer[randomMathNumber]; 
+        scoreBarPlayer.innerHTML = sumPlayer;
+    }
 
-        
+    return sumPlayer
+}
+
+
+function scoreCounterPc (randomMathNumber) { 
+    if (arrayOfValuesPc.length < 6) { 
+        (randomMathNumber ==='J' || randomMathNumber ==='K' || randomMathNumber ==='Q') ? arrayOfValuesPc.push(10):
+        (randomMathNumber ==='A') ? arrayOfValuesPc.push(1):
+        arrayOfValuesPc.push(randomMathNumber);
+    }
+
+    if (theTruthPc) { 
+        sumPc += arrayOfValuesPc[randomMathNumber]; 
+        scoreBarPc.innerHTML = sumPc;
+    }
+
+    return sumPc
 
 }
 
-function scoreCounterPc (randomMathNumber) { 
-    arrayScorePc.push(randomMathNumber)
-}    
 
+// Decide the Winner
+
+function functionOfWinner(realSumScorePlayer, realSumScorePc){ 
+    if (realSumScorePlayer > 21 ) { 
+        counterFunctionPlayer = 5;
+        counterFunctionPc = 0;
+        deckCardsPlayer = [];
+        arrayOfValuesPlayer = []
+        alert('bro has perdido, te pasaste de 21')
+    } 
+    if (realSumScorePc > 21 ) { 
+        counterFunctionPc = 1;
+        deckCardsPc = [];
+        arrayOfValuesPc = []
+        alert('bro has ganado, el cpu pasó 21')
+    }    
+} 
+function functionOfWinner(realSumScorePc){ 
+    
+    
+} 
 
 
 
@@ -169,15 +216,26 @@ btnNewGame.addEventListener('click' , ()=> {
 
     imageContainerPlayer.innerHTML = '';
     imageContainerPc.innerHTML = '';
+    scoreBarPlayer.innerHTML = 0;
+    scoreBarPc.innerHTML = 0;
+
     deckCardsPlayer = [];
     deckCardsPc = [];
-    arrayScorePlayer = [];
-    arrayScorePc = [];
+    arrayOfValuesPlayer = [];
+    arrayOfValuesPc = [];
+
     counterFunctionPlayer = 0;
+    counterFunctionPc = 0;
+    sumPlayer = 0;
+    sumPc = 0;
+    theTruthPlayer = 0;
+    theTruthPc = 0;
+
     createDeckCardsPlayer();
     createDeckCardsPc();
+
     console.log('nuevas Barajas');
-    console.log(arrayScorePlayer)
+    console.log(arrayOfValuesPlayer)
     
     });
 
@@ -186,6 +244,7 @@ btnStay.addEventListener('click', ()=> {
     if ( counterFunctionPlayer < 5 ) {
         counterFunctionPlayer = 5;
         gameFunctionCardsPc();
+        // functionOfWinner = false
     }
     
 });
