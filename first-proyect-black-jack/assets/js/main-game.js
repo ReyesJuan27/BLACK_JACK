@@ -11,73 +11,86 @@ const imageContainerPc = document.querySelector('.imagesCardsPc');
 const scoreBarPlayer = document.querySelector('#scoreBarPlayer');
 const scoreBarPc = document.querySelector('#scoreBarPc');
 
+// Basic arrays/objects that's used in the functions // ========================
 
 
-// Basic arrays/objects that's used in the functions 
+let deckCardsPlayer = [] , deckCardsPc = [], arrayOfValuesPlayer = [] , arrayOfValuesPc = [];
+let counterFunctionPlayer= 0 , counterFunctionPc = 0;
+
+let manualDeckCardsPlayer = [
+    '9C',
+    '10C',
+    '4S', 
+    'AC',
+    '4C',
+    '7S'
+], manualDeckCardsPc = [
+    '10C',
+    '10S', 
+    '5C',
+    'AC',
+    '4C',
+    '2C'
+];
 
 
-let deckCardsPlayer = [];
-let deckCardsPc = [];
-let arrayOfValuesPlayer = []
-let arrayOfValuesPc = []
-let counterFunctionPlayer = 0;
-let counterFunctionPc = 0;
+let sumPlayer = 0, sumPc = 0;
 
-let sumPlayer = 0;
-let sumPc = 0;
-let theTruthPlayer;
-let theTruthPc;
+let theTruthPlayer, theTruthPc;
+
 let valueSpecialCard;
 
 const specialCards = { 11 : 'A', 12 : 'J', 13 : 'K', 14 : 'Q'};
 const possibleLetters = ['C','D','H','S'];
 
 
-// Random cards for choise one of the nummbers and letters
-
-
 const randomLetterCard = ()=> {
 
     let ramdomIndex = Math.floor( Math.random() * possibleLetters.length );
-
     let ramdomLetter = possibleLetters[ramdomIndex];
 
     return ramdomLetter
 }
 
-
-// Create a New Deck for the Player and CPU Randomly
+// Create a New Deck for the Player and CPU Randomly // ========================
 
 
 const createDeckCardsPlayer = () => {
    
-    for ( let i = 0; i < 6; i++ ) {
+    for ( let i = 0; i < 6; i++ ) { //&& manualTruthUse // i < 6 (original)
         
         const probabilityOfCardsPlayer = () => {
             let randomNumberCard = Math.round(2 + Math.random() * 12); // random number 2-14
 
             if (randomNumberCard <= 10) { 
-                scoreCounterPlayer(randomNumberCard);
+                scoreCounterPlayer(randomNumberCard, false);
                 return randomNumberCard
                 
             } else {
-                scoreCounterPlayer(specialCards[randomNumberCard]);
+                scoreCounterPlayer(specialCards[randomNumberCard], false);
                 return specialCards[randomNumberCard]
             }
         }
         
-        deckCardsPlayer.push(`assets/cartas/${probabilityOfCardsPlayer()}${randomLetterCard()}.png`); 
-}
-console.log(deckCardsPlayer, 'soy player');
-console.log(arrayOfValuesPlayer);
+        deckCardsPlayer.push(`assets/cartas/${ probabilityOfCardsPlayer() }${ randomLetterCard() }.png`); //original
+        
+        // Manual Cards ===================================================================== //call it or not for testing 
+        
+        // const numberCardsPlayerManual = (index) => (manualDeckCardsPlayer[index].length == 2) ? manualDeckCardsPlayer[index][0] : 10 
+        // const letterCardsPlayerManual = (index2) => (manualDeckCardsPlayer[index2].length == 2) ? manualDeckCardsPlayer[index2][1] : manualDeckCardsPlayer[index2][2]
 
+        // deckCardsPlayer.push(`assets/cartas/${ numberCardsPlayerManual(i) }${ letterCardsPlayerManual(i) }.png`); 
+        // scoreCounterPlayer( numberCardsPlayerManual(i) );
+
+        // =====================================================================
+    }
 }
 
 createDeckCardsPlayer();
 
 const createDeckCardsPc = () => {
         
-    for ( let i = 0; i < 6; i++ ) {
+    for ( let i = 0; i < 6; i++ ) { //&& manualTruthUse // i < 6 (original)
         
         let randomNumberCard = Math.round(2 + Math.random() * 12);
         const probabilityOfCardsPc = () => {
@@ -92,22 +105,28 @@ const createDeckCardsPc = () => {
             }
         }
 
-        deckCardsPc.push(`assets/cartas/${probabilityOfCardsPc()}${randomLetterCard()}.png`);
-    }
-    console.log(deckCardsPc,'soy pc');
-    console.log(arrayOfValuesPc);
+        deckCardsPc.push(`assets/cartas/${probabilityOfCardsPc()}${randomLetterCard()}.png`); //original
 
-     
+        // Manual Cards ===================================================================== // call it or not for testing 
+
+        // const numberCardsPcManual = (index) => (manualDeckCardsPc[index].length == 2) ? manualDeckCardsPc[index][0] : 10 
+        // const letterCardsPcManual = (index2) => (manualDeckCardsPc[index2].length == 2) ? manualDeckCardsPc[index2][1] : manualDeckCardsPc[index2][2]
+
+        // deckCardsPc.push(`assets/cartas/${ numberCardsPcManual(i) }${ letterCardsPcManual(i) }.png`); 
+        // scoreCounterPc( numberCardsPcManual(i) )
+
+        // =====================================================================
+
+    }
 }
 
 createDeckCardsPc();
 
-// Modificate the Html for add the images 
+// Modificate the Html for add the images // ========================
 
 
-const addImageHtml = () => {
+const addImageHtml = async () => {
     if ( counterFunctionPlayer < 6 ) {
-        
         
         let imageDesignerPlayer = document.createElement('img');
         imageDesignerPlayer.classList.add('cardImage');
@@ -115,141 +134,245 @@ const addImageHtml = () => {
         imageContainerPlayer.append(imageDesignerPlayer);
         
         theTruthPlayer = true;
-        let realSumScore = scoreCounterPlayer(counterFunctionPlayer)
-        functionOfWinner(realSumScore, 0);
+        let realSumScorePlayer = scoreCounterPlayer( counterFunctionPlayer, true )
         counterFunctionPlayer++;
 
+        if (realSumScorePlayer > 21) {
+            
+            counterFunctionPlayer = 6, counterFunctionPc = 0;            
+            gameFunctionCardsPc(realSumScorePlayer);            
+            
+        }
+        
+        if ( realSumScorePlayer === 21 && (arrayOfValuesPlayer[0] == 10 || arrayOfValuesPlayer[0] == 11 ) ) { // if the player reach a natural 21
 
-        gameFunctionCardsPc();        
-    }
+            counterFunctionPlayer = 6, counterFunctionPc = 0;
+            return await gameFunctionCardsPc( true );
+
+        } else if ( realSumScorePlayer === 21 ) { // if the player reach a no natural 21
+            
+            counterFunctionPlayer = 6, counterFunctionPc = 0;
+            return await gameFunctionCardsPc();
+        } 
+
+    } else { return counterFunctionPlayer }    
 }
 
 btnAskCard.addEventListener('click', addImageHtml);
 
-// Show the cards of the Pc after the play of the Player
+
+// Show the cards of the Pc after the play of the Player // ========================
 
 
-const gameFunctionCardsPc = async () => {
-    
-    for ( let i = 0; counterFunctionPlayer >= 5 && i <= 5 && counterFunctionPc == 0 ; i++ ) {
-        
+const gameFunctionCardsPc = async (value) => {
+
+    for ( let i = 0; counterFunctionPlayer >= 6 && counterFunctionPc == 0 && i <= 5; i++ ) {
+
         let imageDesignerPc = document.createElement('img');
         imageDesignerPc.classList.add('cardImagePc');
         imageDesignerPc.setAttribute('src', deckCardsPc[i]);
         imageContainerPc.append(imageDesignerPc);
-        scoreBarPc.innerHTML = arrayOfValuesPc[i];
+        scoreBarPc.innerHTML = arrayOfValuesPc[i];                
         
         theTruthPc = true;
-        let realSumScore = scoreCounterPc(counterFunctionPc);
-        functionOfWinner(0, realSumScore);
+        let realSumScorePc = scoreCounterPc( i, true );
 
-        
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        // if (functionOfWinner){counterFunctionPc = 1}
+        let stopLoop = await functionOfWinner ( sumPlayer, realSumScorePc, i );
+        if ( stopLoop ) { break }
+
+        await new Promise( resolve => setTimeout ( resolve, 1000 ) );
     }
 }
 
-// Score Bar of the Player and the Pc
 
+// Score Bar of the Player and the Pc // ========================
 
-function scoreCounterPlayer (randomMathNumber) { 
+function scoreCounterPlayer (randomMathNumber, trueValue) { 
     if (arrayOfValuesPlayer.length < 6) { 
-        (randomMathNumber ==='J' || randomMathNumber ==='K' || randomMathNumber ==='Q') ? arrayOfValuesPlayer.push(10):
-        (randomMathNumber ==='A') ? arrayOfValuesPlayer.push(1):
-        arrayOfValuesPlayer.push(randomMathNumber);
+        (randomMathNumber ==='J' || randomMathNumber ==='K' || randomMathNumber ==='Q') ? arrayOfValuesPlayer.push(10) :
+        (randomMathNumber ==='A') ? arrayOfValuesPlayer.push(1) : arrayOfValuesPlayer.push( parseInt(randomMathNumber) );
     }
     
     if (theTruthPlayer) { 
-        sumPlayer += arrayOfValuesPlayer[randomMathNumber]; 
-        scoreBarPlayer.innerHTML = sumPlayer;
-    }
+        
+        if (trueValue) {
+            
+            if ( arrayOfValuesPlayer[randomMathNumber] == 1 && sumPlayer > 10 )  { 
+                                
+                sumPlayer += arrayOfValuesPlayer[randomMathNumber]; 
+                scoreBarPlayer.innerHTML = sumPlayer;
+                
+            }
+            else if ( arrayOfValuesPlayer[randomMathNumber] == 1  && sumPlayer <= 10 ) {  //here is the chance of the value of the As
+                
+                arrayOfValuesPlayer[randomMathNumber] = 11;
+                sumPlayer += arrayOfValuesPlayer[randomMathNumber]; 
+                scoreBarPlayer.innerHTML = sumPlayer;                
 
-    return sumPlayer
+            }
+            else {
+                
+                sumPlayer += arrayOfValuesPlayer[randomMathNumber]; 
+                scoreBarPlayer.innerHTML = sumPlayer;
+                
+            }
+            
+        }
+        return sumPlayer;
+    }
+    
 }
 
 
 function scoreCounterPc (randomMathNumber) { 
     if (arrayOfValuesPc.length < 6) { 
-        (randomMathNumber ==='J' || randomMathNumber ==='K' || randomMathNumber ==='Q') ? arrayOfValuesPc.push(10):
-        (randomMathNumber ==='A') ? arrayOfValuesPc.push(1):
-        arrayOfValuesPc.push(randomMathNumber);
+        (randomMathNumber ==='J' || randomMathNumber ==='K' || randomMathNumber ==='Q') ? arrayOfValuesPc.push(10) :
+        (randomMathNumber ==='A') ? arrayOfValuesPc.push(1) : arrayOfValuesPc.push( parseInt(randomMathNumber) );
+        
     }
 
     if (theTruthPc) { 
-        sumPc += arrayOfValuesPc[randomMathNumber]; 
-        scoreBarPc.innerHTML = sumPc;
+
+        if ( arrayOfValuesPc[randomMathNumber] == 1 && sumPc > 10 )  { 
+                            
+            sumPc += arrayOfValuesPlayer[randomMathNumber]; 
+            scoreBarPc.innerHTML = sumPc;
+            
+        }
+        else if ( arrayOfValuesPc[randomMathNumber] == 1  && sumPc <= 10 ) { //here is the chance of the value of the As
+            
+            arrayOfValuesPc[randomMathNumber] = 11;
+            sumPc += arrayOfValuesPc[randomMathNumber];
+            scoreBarPc.innerHTML = sumPc;                
+
+        } 
+        else {
+            
+            sumPc += arrayOfValuesPc[randomMathNumber]; 
+            scoreBarPc.innerHTML = sumPc;
+            
+        }
+        return sumPc;
     }
-
-    return sumPc
-
+    
 }
 
 
-// Decide the Winner
+// Decide the Winner // ========================
 
-function functionOfWinner(realSumScorePlayer, realSumScorePc){ 
-    if (realSumScorePlayer > 21 ) { 
-        counterFunctionPlayer = 5;
-        counterFunctionPc = 0;
-        deckCardsPlayer = [];
-        arrayOfValuesPlayer = []
-        alert('bro has perdido, te pasaste de 21')
+async function functionOfWinner(realSumScorePlayer, realSumScorePc, counterCards) { 
+   
+    // natural 21, asking for the chance of an natural push
+    
+    if ( (arrayOfValuesPlayer[0] + arrayOfValuesPlayer[1] == 21) && counterCards == 1 ) {    
+        
+        if ( ( arrayOfValuesPc[0] + arrayOfValuesPc[1] ) == 21 ) {
+            
+            counterFunctionPc = 1, deckCardsPc = [], deckCardsPlayer = [], arrayOfValuesPlayer = [],  arrayOfValuesPc = [];
+            setTimeout( () => { alert( 'Bro, WHAT!, ha sido un empate, ambos jugadores sacaron un 21 natural' ) ; }, 400 );
+            return true;
+        } 
+
+        else if ( sumPc != 21 && counterCards == 1 ) {
+
+            return setTimeout(() => { 
+
+                counterFunctionPlayer = 6, counterFunctionPc = 0
+                alert('bro has ganado, sacaste un 21 natural y el pc no');
+                return true; 
+
+            }, 400); 
+        }
     } 
+      
+    // no natural 21, asking for the chance of an no natural push
+    
+    if ( realSumScorePlayer == 21 && counterCards > 1 ) { 
+
+        if ( realSumScorePc == 21) { 
+
+            arrayOfValuesPlayer = [], counterFunctionPlayer = 0; 
+            setTimeout(() => { alert('bro ha sido un empate, ambos jugadores sacaron un 21 no natural');}, 400);
+            return true;
+
+        } else return setTimeout(() => { 
+    
+            counterFunctionPlayer = 6, counterFunctionPc = 0;
+            alert('bro has ganado, clavaste el 21');
+            return true; 
+    
+        }, 400);
+    }
+
+    // PLAYER 
+
+    if ( realSumScorePlayer > 21 ) {
+
+            arrayOfValuesPlayer = [], counterFunctionPlayer = 6;
+            setTimeout(() => { alert('bro has perdido, te pasaste de 21');}, 400);
+            return true; 
+        }
+
+    
+    // PC
+
+    if ( realSumScorePc == 21){
+
+        counterFunctionPc = 1, deckCardsPc = [], arrayOfValuesPc = [];
+        setTimeout(() => {alert('bro has perdido, la cpu clavo el 21');}, 400);
+
+        return true;
+    }
+
     if (realSumScorePc > 21 ) { 
-        counterFunctionPc = 1;
-        deckCardsPc = [];
-        arrayOfValuesPc = []
-        alert('bro has ganado, el cpu pasó 21')
+
+        counterFunctionPc = 1, arrayOfValuesPc = [];
+        setTimeout(() => {alert('bro has ganado, el cpu se pasó de 21');}, 400);
+        return true 
     }    
-} 
-function functionOfWinner(realSumScorePc){ 
     
     
-} 
+    // DRAW
+    
+
+    if ( realSumScorePc === realSumScorePlayer ) { 
+        
+        counterFunctionPc = 1, arrayOfValuesPc = [], arrayOfValuesPlayer = [];
+        setTimeout(() => {alert('bro ha sido un empate');}, 400)
+        return true; 
+    }
+    
+    
+    if (realSumScorePc > realSumScorePlayer && realSumScorePc < 21) {
+        
+        counterFunctionPc = 1, arrayOfValuesPc = [];
+        setTimeout(() => {alert('bro has perdido, el cpu saco un puntaje mayor al tuyo');}, 400);
+        return true; 
+    }
+
+}    
 
 
-
-// Button Actions
+// Button Actions // ========================
 
 
 btnNewGame.addEventListener('click' , ()=> {
 
-    imageContainerPlayer.innerHTML = '';
-    imageContainerPc.innerHTML = '';
-    scoreBarPlayer.innerHTML = 0;
-    scoreBarPc.innerHTML = 0;
+    imageContainerPlayer.innerHTML = '', imageContainerPc.innerHTML = '', scoreBarPlayer.innerHTML = 0, scoreBarPc.innerHTML = 0;
 
-    deckCardsPlayer = [];
-    deckCardsPc = [];
-    arrayOfValuesPlayer = [];
-    arrayOfValuesPc = [];
-
-    counterFunctionPlayer = 0;
-    counterFunctionPc = 0;
-    sumPlayer = 0;
-    sumPc = 0;
-    theTruthPlayer = 0;
-    theTruthPc = 0;
+    deckCardsPlayer = [], deckCardsPc = [], arrayOfValuesPlayer = [], arrayOfValuesPc = [];
+    
+    counterFunctionPlayer = 0, counterFunctionPc = 0, sumPlayer = 0, sumPc = 0, theTruthPlayer = 0, theTruthPc = 0;
 
     createDeckCardsPlayer();
     createDeckCardsPc();
 
-    console.log('nuevas Barajas');
-    console.log(arrayOfValuesPlayer)
-    
     });
 
 btnStay.addEventListener('click', ()=> {
+    if ( counterFunctionPlayer < 6 ) {
 
-    if ( counterFunctionPlayer < 5 ) {
-        counterFunctionPlayer = 5;
-        gameFunctionCardsPc();
-        // functionOfWinner = false
+        counterFunctionPlayer = 6, counterFunctionPc = 0;
+        gameFunctionCardsPc();        
     }
-    
 });
-
-
-
-
-
