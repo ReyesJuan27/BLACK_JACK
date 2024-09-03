@@ -18,19 +18,19 @@ let deckCardsPlayer = [] , deckCardsPc = [], arrayOfValuesPlayer = [] , arrayOfV
 let counterFunctionPlayer= 0 , counterFunctionPc = 0;
 
 let manualDeckCardsPlayer = [
-    '9C',
-    '10C',
-    '4S', 
-    'AC',
-    '4C',
-    '7S'
+    '6S',
+    '3D',
+    '7D', 
+    'QS',
+    '6H',
+    'QC'
 ], manualDeckCardsPc = [
-    '10C',
-    '10S', 
-    '5C',
-    'AC',
+    '8H',
+    '3C', 
+    'AD',
+    '2H',
     '4C',
-    '2C'
+    '7C'
 ];
 
 
@@ -155,6 +155,8 @@ const addImageHtml = async () => {
             return await gameFunctionCardsPc();
         } 
 
+        btnNewGame.disabled = true;
+
     } else { return counterFunctionPlayer }    
 }
 
@@ -182,6 +184,7 @@ const gameFunctionCardsPc = async (value) => {
 
         await new Promise( resolve => setTimeout ( resolve, 1000 ) );
     }
+    btnNewGame.disabled = false;
 }
 
 
@@ -235,7 +238,7 @@ function scoreCounterPc (randomMathNumber) {
 
         if ( arrayOfValuesPc[randomMathNumber] == 1 && sumPc > 10 )  { 
                             
-            sumPc += arrayOfValuesPlayer[randomMathNumber]; 
+            sumPc += arrayOfValuesPc[randomMathNumber]; 
             scoreBarPc.innerHTML = sumPc;
             
         }
@@ -285,9 +288,9 @@ async function functionOfWinner(realSumScorePlayer, realSumScorePc, counterCards
         }
     } 
       
-    // no natural 21, asking for the chance of an no natural push
+    // no natural 21, asking for the chance of a no natural push
     
-    if ( realSumScorePlayer == 21 && counterCards > 1 ) { 
+    if ( realSumScorePlayer == 21 && realSumScorePc >= 21) { // && counterCards > 1
 
         if ( realSumScorePc == 21) { 
 
@@ -295,13 +298,19 @@ async function functionOfWinner(realSumScorePlayer, realSumScorePc, counterCards
             setTimeout(() => { alert('bro ha sido un empate, ambos jugadores sacaron un 21 no natural');}, 400);
             return true;
 
-        } else return setTimeout(() => { 
-    
+        } if ( realSumScorePc > 21 ){
             counterFunctionPlayer = 6, counterFunctionPc = 0;
-            alert('bro has ganado, clavaste el 21');
+            setTimeout(() => { alert('bro has ganado, el pc se paso y tu clavaste el 21 '); }, 400);
             return true; 
     
-        }, 400);
+        }
+        else {
+    
+            counterFunctionPlayer = 6, counterFunctionPc = 0;
+            setTimeout(() => { alert('bro has ganado, clavaste el 21'); }, 400);
+            return true; 
+        }
+        
     }
 
     // PLAYER 
